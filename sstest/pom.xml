@@ -8,6 +8,21 @@
     <artifactId>sstest</artifactId>
     <version>1.0</version>
 
+    <repositories>
+        <repository>
+            <id>mvn-repo</id>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>clojars-repo</id>
+            <url>http://clojars.org/repo</url>
+        </repository>
+        <repository>
+            <id>xad-s3-repo</id>
+            <url>s3://xad-mvn-repo/maven2</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <dependency>
@@ -21,6 +36,12 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
             <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xad.enigma</groupId>
+            <artifactId>enigma-common</artifactId>
+            <version>1.0.9</version>
         </dependency>
 
     </dependencies>
@@ -58,6 +79,15 @@
 
 
         </plugins>
+
+        <extensions>
+            <extension>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
+            </extension>
+        </extensions>
+
     </build>
 
 </project>
