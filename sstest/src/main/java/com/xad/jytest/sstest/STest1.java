@@ -1,5 +1,6 @@
 package com.xad.jytest.sstest;
 
+import com.google.protobuf.ByteString;
 import com.xad.enigma.EnigmaEventFramework;
 import kafka.serializer.DefaultDecoder;
 import kafka.serializer.StringDecoder;
@@ -20,12 +21,35 @@ import org.apache.spark.streaming.kafka.KafkaUtils;
 import scala.Tuple2;
 
 import com.xad.enigma.core.EnigmaFramework;
-import com.xad.enigma.eventmodel.core.Topic;
+//import com.xad.enigma.eventmodel.core.Topic;
 import com.google.protobuf.Message;
+
 import org.apache.avro.protobuf.ProtobufDatumWriter;
 import org.apache.hadoop.fs.Path;
 import com.xad.enigma.EnigmaEventFramework.EnigmaEnvelope;
 import java.util.*;
+import com.xad.enigma.AdDetailsTopic.AdDetails;
+import com.xad.enigma.*;
+import com.xad.enigma.AdDemandPartnerReportingRequestTopic.AdDemandPartnerReportingRequest;
+import com.xad.enigma.AdDemandPartnerReportingRequestTopic.AdDemandPartnerReportingRequest;
+import com.xad.enigma.AdDetailsTopic.AdDetails;
+import com.xad.enigma.AdRequestTopic.AdRequest;
+import com.xad.enigma.AdTrackingTopic.AdTracking;
+import com.xad.enigma.AdUserProfileTopic.AdUserProfile;
+import com.xad.enigma.DelUserProfileTopic.DelUserProfile;
+import com.xad.enigma.RTITrackingTopic.RTITracking;
+import com.xad.enigma.SampleTrackingTopic.SampleTracking;
+import com.xad.enigma.HttpVendorStatsTopic.HttpVendorStats;
+import com.xad.enigma.SegmentBuilderTopic.SegmentBuilder;
+import com.xad.enigma.UserTrackingTopic.UserTracking;
+import com.xad.enigma.BlockAttributesTopic.BlockAttributes;
+import com.xad.enigma.AdDocumentTopic.AdDocument;
+import com.xad.enigma.RTITrackingTopic.RTITracking;
+import com.xad.enigma.AtlanticMetaDataTopic.AtlanticMetaData;
+import com.xad.enigma.VisitTrackingTopic.VisitTracking;
+import com.xad.enigma.VisitTrackingTopic.AdExposure;
+import com.xad.enigma.ControlGroupTopic.ControlGroup;
+import com.xad.enigma.AdMarkupTopic.AdMarkup;
 
 import groovy.util.logging.Log4j;
 
@@ -83,12 +107,20 @@ public class STest1 {
             @Override
             public Message call(Tuple2<byte[], EnigmaEnvelope> tuple2) {
                 EnigmaEnvelope envelope  = tuple2._2();
-                Class protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
+                Topic topic = Topic.fromName(envelope.getEventTopic());
+                Class<com.google.protobuf.Message> protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
                 Schema schema = ProtobufData.get().getSchema(protoClass);
-                Message record = protoClass.parseFrom(envelope.getEventData());
-                return record;
+
+                try{
+                    Message record = STest1.parseFromEnvelope (topic, envelope.getEventData());
+                    return record;
+                } catch(Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
         });
+
 
 
 //        directStream.foreachRDD(new Function<JavaPairRDD<byte[], EnigmaEnvelope>>() {
@@ -117,6 +149,32 @@ public class STest1 {
         // Start the computation
         jssc.start();
         jssc.awaitTermination();
+    }
+    public static Message parseFromEnvelope(Topic topic, ByteString  eventDate) throws com.google.protobuf.InvalidProtocolBufferException{
+        switch (topic) {
+            case AD_DEMAND_PARTNER_REPORTING_REQUEST: AdDemandPartnerReportingRequest.parseFrom(eventDate);
+            case AD_REQUEST: AdRequest.parseFrom(eventDate);
+            case AD_DETAILS: AdDetails.parseFrom(eventDate);
+            case AD_TRACKING: AdTracking.parseFrom(eventDate);
+            case AD_USER_PROFILE: AdUserProfile.parseFrom(eventDate);
+            case UPDATE_USER_PROFILE: AdUserProfile.parseFrom(eventDate);
+            case DEL_USER_PROFILE: DelUserProfile.parseFrom(eventDate);
+            case SAMPLE_TRACKING: SampleTracking.parseFrom(eventDate);
+            case HTTP_VENDOR_STATS:HttpVendorStats.parseFrom(eventDate);
+            case SEGMENT_BUILDER: SegmentBuilder.parseFrom(eventDate);
+            case USER_TRACKING: UserTracking.parseFrom(eventDate);
+            case BLOCK_ATTRIBUTES: BlockAttributes.parseFrom(eventDate);
+            case AD_DOCUMENT: AdDocument.parseFrom(eventDate);
+            case RTI_TRACKING: RTITracking.parseFrom(eventDate);
+            case ATLANTIC_METADATA: AtlanticMetaData.parseFrom(eventDate);
+            case VISIT_TRACKING: VisitTracking.parseFrom(eventDate);
+            case AD_EXPOSURE: AdExposure.parseFrom(eventDate);
+            case AD_EXPOSURE_STATE: AdExposure.parseFrom(eventDate);
+            case CONTROL_GROUP: ControlGroup.parseFrom(eventDate);
+            case  AD_MARKUP: AdMarkup.parseFrom(eventDate);
+            case DATA_REQUEST: AdRequest.parseFrom(eventDate);
+
+        }
     }
     private Path getOutputPath() {
 
