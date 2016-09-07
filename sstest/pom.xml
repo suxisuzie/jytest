@@ -36,6 +36,30 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>com.xad.enigma</groupId>
+            <artifactId>enigma-common</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/enigma-common-1.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xad.enigma</groupId>
+            <artifactId>enigma-event_model</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/enigma-event_model-1.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xad.enigma</groupId>
+            <artifactId>kafka_formatter</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/kafka_formatter-1.0.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -25,25 +25,18 @@ import com.google.protobuf.Message;
 import org.apache.avro.protobuf.ProtobufDatumWriter;
 import org.apache.hadoop.fs.Path;
 import com.xad.enigma.EnigmaEventFramework.EnigmaEnvelope;
+
 import java.util.*;
-
-import groovy.util.logging.Log4j;
-
-@Log4j
 
 /**
  * Created by jamesyu on 9/1/16.
  */
 public class STest1 {
-    /**
-     * brokers
-     * topics
-     *
-     * @param args
-     */
+
     public final static String EXT = ".avro";
+
     private static void process(String[] args) throws Exception {
-        SparkConf conf = new SparkConf().setMaster("local[2]").setAppName("jytest-ss");
+        SparkConf conf = new SparkConf().setAppName("jytest-ss");
         // 1 minute time batch
 
         //just do this current in the future change the properties ?
@@ -77,12 +70,13 @@ public class STest1 {
         });
 
         lines.print();*/
-        final DataFileWriter<Object> writer = new DataFileWriter<>(new ProtobufDatumWriter<>());
-        Path path = getOutputPath();
+        // final DataFileWriter<Object> writer = new DataFileWriter<>(new ProtobufDatumWriter<>());
+        // Path path = getOutputPath();
+
         JavaDStream<Message> message = directStream.map(new Function<Tuple2<byte[], EnigmaEnvelope>, Message>() {
             @Override
             public Message call(Tuple2<byte[], EnigmaEnvelope> tuple2) {
-                EnigmaEnvelope envelope  = tuple2._2();
+                EnigmaEnvelope envelope = tuple2._2();
                 Class protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
                 Schema schema = ProtobufData.get().getSchema(protoClass);
                 Message record = protoClass.parseFrom(envelope.getEventData());
@@ -113,14 +107,15 @@ public class STest1 {
 //        directStream.map(message->)
 
 
-
         // Start the computation
         jssc.start();
         jssc.awaitTermination();
     }
+
     private Path getOutputPath() {
 
     }
+
     public static void main(String[] args) throws Exception {
         //TODO: check the args
 
