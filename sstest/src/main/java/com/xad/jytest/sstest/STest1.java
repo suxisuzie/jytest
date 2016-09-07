@@ -1,30 +1,18 @@
 package com.xad.jytest.sstest;
 
-import com.xad.enigma.EnigmaEventFramework;
+import com.google.protobuf.Message;
+import com.xad.enigma.*;
+import com.xad.enigma.EnigmaEventFramework.EnigmaEnvelope;
+import com.xad.enigma.eventmodel.core.Topic;
 import kafka.serializer.DefaultDecoder;
-import kafka.serializer.StringDecoder;
-import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.protobuf.ProtobufData;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import scala.Tuple2;
-
-import com.xad.enigma.core.EnigmaFramework;
-import com.xad.enigma.eventmodel.core.Topic;
-import com.google.protobuf.Message;
-import org.apache.avro.protobuf.ProtobufDatumWriter;
-import org.apache.hadoop.fs.Path;
-import com.xad.enigma.EnigmaEventFramework.EnigmaEnvelope;
 
 import java.util.*;
 
@@ -76,45 +64,81 @@ public class STest1 {
         JavaDStream<Message> message = directStream.map(new Function<Tuple2<byte[], EnigmaEnvelope>, Message>() {
             @Override
             public Message call(Tuple2<byte[], EnigmaEnvelope> tuple2) {
-                EnigmaEnvelope envelope = tuple2._2();
-                Class protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
-                Schema schema = ProtobufData.get().getSchema(protoClass);
-                Message record = protoClass.parseFrom(envelope.getEventData());
-                return record;
+                try {
+                    EnigmaEnvelope envelope = tuple2._2();
+
+
+                    Class<com.google.protobuf.Message> protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
+
+                    String topic = envelope.getEventTopic();
+                    byte[] data = envelope.getEventData().toByteArray();
+
+                    switch (topic) {
+                        case "enigma.event.AdDemandPartnerReportingRequest":
+                            return AdDemandPartnerReportingRequestTopic.AdDemandPartnerReportingRequest.parseFrom(data);
+                        case "enigma.event.AdRequest":
+                            return AdRequestTopic.AdRequest.parseFrom(data);
+                        case "enigma.event.AdDetails":
+                            return AdDetailsTopic.AdDetails.parseFrom(data);
+                        case "enigma.event.AdTracking":
+                            return AdTrackingTopic.AdTracking.parseFrom(data);
+                        case "enigma.event.AdUserProfile":
+                            return AdUserProfileTopic.AdUserProfile.parseFrom(data);
+                        case "enigma.event.UpdateUserProfile":
+                            return AdUserProfileTopic.AdUserProfile.parseFrom(data);
+                        case "enigma.event.DelUserProfile":
+                            return DelUserProfileTopic.DelUserProfile.parseFrom(data);
+                        case "enigma.event.SampleTracking":
+                            return SampleTrackingTopic.SampleTracking.parseFrom(data);
+                        case "enigma.event.HttpVendorStats":
+                            return HttpVendorStatsTopic.HttpVendorStats.parseFrom(data);
+                        case "enigma.event.SegmentBuilder":
+                            return SegmentBuilderTopic.SegmentBuilder.parseFrom(data);
+                        case "enigma.event.UserTracking":
+                            return UserTrackingTopic.UserTracking.parseFrom(data);
+                        case "enigma.event.BlockAttributes":
+                            return BlockAttributesTopic.BlockAttributes.parseFrom(data);
+                        case "enigma.event.AdDocument":
+                            return AdDocumentTopic.AdDocument.parseFrom(data);
+                        case "enigma.event.RTITracking":
+                            return RTITrackingTopic.RTITracking.parseFrom(data);
+                        case "enigma.event.rev.AtlanticMetaData":
+                            return AtlanticMetaDataTopic.AtlanticMetaData.parseFrom(data);
+                        case "enigma.event.VisitTracking":
+                            return VisitTrackingTopic.VisitTracking.parseFrom(data);
+                        case "enigma.event.AdExposure":
+                            return VisitTrackingTopic.AdExposure.parseFrom(data);
+                        case "enigma.event.AdExposureState":
+                            return VisitTrackingTopic.AdExposure.parseFrom(data);
+                        case "enigma.event.SvlControlGroup":
+                            return ControlGroupTopic.ControlGroup.parseFrom(data);
+                        case "enigma.event.AdMarkup":
+                            return AdMarkupTopic.AdMarkup.parseFrom(data);
+                        case "enigma.event.DataRequest":
+                            return AdRequestTopic.AdRequest.parseFrom(data);
+
+                        default:
+                            return null;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
+
         });
 
-
-//        directStream.foreachRDD(new Function<JavaPairRDD<byte[], EnigmaEnvelope>>() {
-//            @Override
-//            public Void call(JavaPairRDD<byte[], EnigmaEnvelope> enigmaEnvelopeJavaPairRDD) throws Exception {
-//                return enigmaEnvelopeJavaPairRDD.foreach(new Function<Tuple2<byte[], EnigmaEnvelope>>() {
-//                    @Override
-//                    public void call(Tuple2<byte[], EnigmaEnvelope> enigmaEnvelopeTuple2) throws Exception {
-//                        EnigmaEnvelope envelope = enigmaEnvelopeTuple2._2();
-//                        if(!envelope.hasIsHeartbeat()) {
-//                            Class protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
-//                            System.out.println(protoClass.toString());
-//                        }
-//
-//
-//                    }
-//                });
-//            }
-//        });
-
-
-//        directStream.map(message->)
-
+        // print
+        message.print();
 
         // Start the computation
         jssc.start();
         jssc.awaitTermination();
     }
 
-    private Path getOutputPath() {
-
-    }
+//    private Path getOutputPath() {
+//
+//    }
 
     public static void main(String[] args) throws Exception {
         //TODO: check the args

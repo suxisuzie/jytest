@@ -35,6 +35,18 @@
             <version>1.8.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.protobuf-java-format</groupId>
+            <artifactId>protobuf-java-format</artifactId>
+            <version>1.4</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.xad.enigma</groupId>
@@ -47,9 +59,9 @@
         <dependency>
             <groupId>com.xad.enigma</groupId>
             <artifactId>enigma-event_model</artifactId>
-            <version>1.0</version>
+            <version>1.0.50</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/enigma-event_model-1.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/enigma-event_model-1.0.50.jar</systemPath>
         </dependency>
 
         <dependency>
