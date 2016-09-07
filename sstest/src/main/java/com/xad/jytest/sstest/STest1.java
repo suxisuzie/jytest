@@ -79,13 +79,14 @@ public class STest1 {
         lines.print();*/
         final DataFileWriter<Object> writer = new DataFileWriter<>(new ProtobufDatumWriter<>());
         Path path = getOutputPath();
-        JavaDStream<EnigmaEnvelope> envelope = directStream.map(new Function<Tuple2<byte[], EnigmaEnvelope>>() {
+        JavaDStream<Message> message = directStream.map(new Function<Tuple2<byte[], EnigmaEnvelope>, Message>() {
             @Override
-            public EnigmaEnvelope call(Tuple2<byte[], EnigmaEnvelope> tuple2) {
+            public Message call(Tuple2<byte[], EnigmaEnvelope> tuple2) {
                 EnigmaEnvelope envelope  = tuple2._2();
                 Class protoClass = Topic.fromName(envelope.getEventTopic()).protoClass;
                 Schema schema = ProtobufData.get().getSchema(protoClass);
-                Message message = protoClass.parseFrom(envelope.getEventData());
+                Message record = protoClass.parseFrom(envelope.getEventData());
+                return record;
             }
         });
 
