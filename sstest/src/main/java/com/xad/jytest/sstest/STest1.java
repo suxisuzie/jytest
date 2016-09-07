@@ -45,8 +45,12 @@ public class STest1 {
     private static void process(String[] args) throws Exception {
         SparkConf conf = new SparkConf().setMaster("local[2]").setAppName("jytest-ss");
         // 1 minute time batch
-        JavaStreamingContext jssc = new JavaStreamingContext(conf, Durations.seconds(1000));
+
         //just do this current in the future change the properties ?
+
+        JavaStreamingContext jssc = new JavaStreamingContext(conf, Durations.seconds(10));
+
+
         String brokers = args[0];
         String topics = args[1];
 
